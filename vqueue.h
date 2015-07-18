@@ -33,13 +33,7 @@ void vq_zcw_end(vq_t * vq, int length);
 // vq_write: "Normal" write interface
 size_t vq_write(vq_t * vq, const void * data, size_t length);
 
-// vq->buffer & vq->length can be accessed directly instead of using this function.
-static inline size_t vq_read(vq_t * vq, void ** read_ptr){
-    if(read_ptr == NULL) return 0;
-
-    *read_ptr = vq->buffer;
-    return vq->length;
-}
+size_t vq_read(vq_t * vq, void * read_ptr, size_t length);
 
 
 #endif

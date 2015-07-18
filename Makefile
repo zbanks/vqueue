@@ -1,6 +1,7 @@
 CC = gcc
-CFLAGS = -lrt -O0 -g -Wall -Wextra -Werror
+CFLAGS = -std=gnu99 -O0 -g -Wall -Wextra -Werror -DNDEBUG
 LDFLAGS = $(CFLAGS)
+LDLIBS = -lrt -lc
 
 .PHONY: all clean
 all: vqueue.o vqueue_test

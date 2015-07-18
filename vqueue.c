@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "vqueue.h"
@@ -12,7 +13,7 @@ vq_t * vq_init(const char * name, size_t min_capacity) {
     if(vq == NULL) goto error;
 
     // Round up capacity to multiple of pagesize
-    size_t pagesize = getpagesize();
+    size_t pagesize = sysconf(_SC_PAGE_SIZE);
     vq->capacity = ((min_capacity + pagesize - 1) & ~(pagesize - 1));
 
     //TODO: remove me
@@ -85,7 +86,7 @@ void vq_zcw_end(vq_t * vq, int length) {
 
 size_t vq_write(vq_t * vq, const void * data, size_t length) {
     void * write_ptr;
-    int size = vq_zcw_start(vq, &write_ptr);
+    size_t size = vq_zcw_start(vq, &write_ptr);
 
     if(size == 0)
         return 0;
@@ -97,4 +98,22 @@ size_t vq_write(vq_t * vq, const void * data, size_t length) {
     vq_zcw_end(vq, size);
     
     return size;
+}
+
+size_t vq_read(vq_t * vq, void * read_ptr, size_t length){
+    if(length > vq->length)
+        length = vq->length;
+
+    if(read_ptr != NULL){
+        memmove(read_ptr, vq->buffer, length);
+    }
+
+    vq->length -= length;
+    vq->buffer += length;
+
+    if((void *) vq->buffer >= vq->_buffer_middle){
+        vq->buffer -= vq->capacity;
+    }
+
+    return length;
 }
