@@ -30,3 +30,9 @@
 
 # Debug files
 *.dSYM/
+
+# vim swapfiles
+*.swp
+*.swn
+*.swm
+*.swo
